@@ -32,13 +32,13 @@ public class Deck
         players.add(new Player("C",Arrays.copyOfRange(deck, 20,30)));
         players.add(new Player("D",Arrays.copyOfRange(deck, 30,41)));
         
-        /*
+        
          //test용 짧은 덱구성
-        players.add(new Player("A",new String[]{"1","4"}));
+       /* players.add(new Player("A",new String[]{"1","4"}));
         players.add(new Player("B",new String[]{"3","2"}));
         players.add(new Player("C",new String[]{"3","1"}));
-        players.add(new Player("D",new String[]{"4","2",joker}));
-        */
+        players.add(new Player("D",new String[]{"4","2",joker}));*/
+        
     }
     public void start()
     {
@@ -50,6 +50,7 @@ public class Deck
     {
         for(Player x : players)
             x.handPrint();
+        System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
     }
     void tern(Player before, Player who)
     {
@@ -57,6 +58,7 @@ public class Deck
         System.out.println("ㅡㅡㅡㅡ 현재턴 : " +who.name);
         who.getCard(before);
         endChk(before);
+        allPlayerHandPrint();
         who.playerSelect();
 
         int x = (players.lastIndexOf(who)+1) % players.size();
@@ -65,7 +67,7 @@ public class Deck
     }
     boolean endChk(Player who)
     {
-        if(who.hand.length == 0)
+        if(who.hand.size() == 0)
         {
             System.out.println("★★★ "+who.name + " 손패가 비었습니다. !!클리어!!");
            

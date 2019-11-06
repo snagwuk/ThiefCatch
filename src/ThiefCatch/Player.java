@@ -1,70 +1,70 @@
 package ThiefCatch;
 
+import java.util.LinkedList;
 import java.util.Scanner;
 
 
 public class Player
 {
     String name;
-    String[] hand;
-    String DEL = "X";
+    //String[] hand;
+    LinkedList<String> hand = new LinkedList<String>();
 
     public Player(String name, String[] hand)
     {
         this.name = name;
+        //this.hand = hand;
+        for(String x : hand)
+            this.hand.add(x);
+    }
+    public LinkedList<String> getHand()
+    {
+        return hand;
+    }
+    public void setHand(LinkedList<String> hand)
+    {
         this.hand = hand;
     }
     void handSuffle()
     {
         for(int i=0 ;  i < 10000; i ++)
         {
-            int ran1 = (int)(Math.random()*hand.length);
-            int ran2 = (int)(Math.random()*hand.length);
+            int ran1 = (int)(Math.random()*hand.size());
+            int ran2 = (int)(Math.random()*hand.size());
             
-            String tmp = hand[ran1];
-            hand[ran1] = hand[ran2];
-            hand[ran2] = tmp;      
+            String tmp = hand.get(ran1);
+            hand.set(ran1, hand.get(ran2));
+            hand.set(ran2, tmp);  
         }
     }
+   
     void getCard(Player before)
     {
         before.handSuffle();
-        String[] befortmp = new String[before.hand.length-1];
-        
-        String getcard = before.hand[before.hand.length-1];
-        
-        for(int i = 0 ; i < befortmp.length; i++)
-            befortmp[i] = before.hand[i];
+       
+        String getcard = before.hand.get(before.hand.size()-1);
+        before.hand.remove(getcard);
+        before.setHand(before.hand);
         
         ////////////////
-        before.setHand(befortmp);
 
-        String[] whotmp = new String[hand.length+1];
-        for(int i = 0 ; i < hand.length; i++)
-            whotmp[i] = hand[i];      
-        whotmp[hand.length] = getcard;
         
-       this.hand = whotmp;
-        
+        this.hand.add(getcard);
         System.out.println("ㅡㅡㅡ" + name + "가 " + before.name + "의 카드한장을 뽑은 후 ");
+        
         //before.handPrint();
         //handPrint();
         
         //endChk(before);
     }
-    public String[] getHand()
-    {
-        return hand;
-    }
-    public void setHand(String[] hand)
-    {
-        this.hand = hand;
-    }
+   
+
     @SuppressWarnings("resource")
     void playerSelect()
     {
-        handPrint();
+       
         Scanner sc = new Scanner(System.in);
+        handPrint();
         System.out.print("ㅡㅡ 1.같은 쌍의 숫자 버리기 / 그외. PASS  >>>");
         int select = sc.nextInt();
         if(select == 1)
@@ -75,6 +75,7 @@ public class Player
             }
             else
             {
+                
                 System.out.print("버릴 숫자쌍 선택 (ex: 4)  >>>");
                 Scanner sc1 = new Scanner(System.in);
                 String pair = sc1.nextLine();
@@ -102,34 +103,18 @@ public class Player
             return;
         }
             
-        String[] whotmp = new String[hand.length-2];
-        int flag = 0;
-        for(int i = 0 ; i<hand.length; i++ )
-        {
-            if( hand[i].equals(what))
-            {
-                hand[i] = DEL;
-                flag++;
-            }
-            if( flag == 2)
-                break;
-        }
-        int index = 0;
-        for(String x : hand)
-            if(!x.equals(DEL))
-                whotmp[index++] = x;
-
-
-        this.hand = whotmp;
+        this.hand.remove(what);
+        this.hand.remove(what);
+        
         System.out.println("ㅡ" +name + "의 손패에서 " + what + " 한쌍 제거 완료");
     }
     boolean handChk()
     {
-        for(int i = 0; i < hand.length; i++)
+        for(int i = 0; i < hand.size(); i++)
         {
             int cnt = 0;
-            for(int j = 0; j < hand.length; j++)
-                if(hand[i].equals(hand[j]))
+            for(int j = 0; j < hand.size(); j++)
+                if(hand.get(i).equals(hand.get(j)))
                     cnt++;
             if(cnt == 2 )
                 return true;
