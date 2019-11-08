@@ -1,10 +1,14 @@
-package ThiefCatch;
+package MultiThiefCatch;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
-public class Deck
+public class MultiThiefCatch
 {
+    public static void main(String[] args)
+    {
+       new MultiThiefCatch().start();
+    }
+    
     int MAX_DECK_LENGTH = 40+1;
     String joker = "¡Ú ";
     String[] deck = new String[MAX_DECK_LENGTH];     

@@ -1,4 +1,4 @@
-package ThiefCatch;
+package MultiThiefCatch;
 
 import java.util.LinkedList;
 import java.util.Scanner;
