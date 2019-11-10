@@ -1,15 +1,27 @@
 package ThiefCatch;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
-public class Deck
+import MultiThiefCatch.MultiThiefCatch;
+
+public class ThiefCatch
 {
     int MAX_DECK_LENGTH = 40+1;
     String joker = "★ ";
     String[] deck = new String[MAX_DECK_LENGTH];     
     LinkedList<Player> players = new LinkedList<Player>();
+    
+    public static void main(String[] args)
+    {
+       new MultiThiefCatch().start();
+    }
 
+    public void start()
+    {
+        deckSetting();
+        allPlayerHandPrint();
+        tern(players.get(players.size()-1),players.get(0));
+    }
     
     void deckSetting()
     {
@@ -34,18 +46,13 @@ public class Deck
         */
         
          //test용 짧은 덱구성
-       players.add(new Player("A",new String[]{"1","4"}));
+        players.add(new Player("A",new String[]{"1","4"}));
         players.add(new Player("B",new String[]{"3","2"}));
         players.add(new Player("C",new String[]{"3","1"}));
         players.add(new Player("D",new String[]{"4","2",joker}));
         
     }
-    public void start()
-    {
-        deckSetting();
-        allPlayerHandPrint();
-        tern(players.get(players.size()-1),players.get(0));
-    }
+    
     void allPlayerHandPrint()
     {
         for(Player x : players)
@@ -57,31 +64,29 @@ public class Deck
         
         System.out.println("ㅡㅡㅡㅡ 현재턴 : " +who.name);
         who.getCard(before);
-        endChk(before);
+        endChk(before);		//	카드 뽑은이후 뽑힌 before의 핸드 사이즈가 0이면 게임에서 제외 + 게임종료까지 
         allPlayerHandPrint();
         who.playerSelect();
-
-        int x = (players.lastIndexOf(who)+1) % players.size();
+        
         allPlayerHandPrint();
+        int x = (players.lastIndexOf(who)+1) % players.size();
         tern(who, players.get(x));
     }
-    boolean endChk(Player who)
+    void endChk(Player who)
     {
         if(who.hand.size() == 0)
         {
             System.out.println("★★★ "+who.name + " 손패가 비었습니다. !!클리어!!");
-           
-            //Player tmp = find(who.name);
-            players.remove(who);
+            players.remove(who);	// 손패가0인 플레이어 목록(players)에서 제거
             
             if(players.size() == 1)
             {
                 System.out.println("○○○○○○○○○○ 게임 종료 ○○○○○○○○○○");
-                System.out.println("최종 도둑 = " +  players.getFirst().name +"님입니다.");
-                System.exit(0);
+                System.out.println("최종 도둑 = " +  players.getFirst().name +"님입니다.");	// 혼자남은 플레이어 가져와서 출력
+                System.exit(0);		// main 시스템 종료
             }  
         }
-        return false;
+        
     }
     Player find(String name)
     {
