@@ -1,6 +1,5 @@
 package MultiTC;
 
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,13 +9,13 @@ import java.util.Scanner;
 
 public class TcpIpMultichatClient
 {
-    
     public static void main(String[] args)
     {
         // TODO Auto-generated method stub
-    	System.out.println(">> Client");
         String name = "PSW";
-        String serverIp = "183.97.16.216";
+        System.out.println(">> Client" + name);
+        String serverIp = "211.63.89.98";
+        
         try
         {
             Socket socket = new Socket(serverIp, 7777);
@@ -38,9 +37,8 @@ public class TcpIpMultichatClient
         }
         
     }
-    
+ 
 }
-
 class ClientSender extends Thread
 {
     Socket socket;
@@ -70,11 +68,12 @@ class ClientSender extends Thread
         
         try
         {
-            if (out != null) out.writeUTF(name);
+            if (out != null) 
+                out.writeUTF(name);
             
             while (out != null)
             {
-                out.writeUTF("["+name+"]" + sc.nextLine());
+                out.writeUTF(sc.nextLine());
             }
         }
         catch (IOException e)
@@ -117,7 +116,9 @@ class ClientReceiver extends Thread
         {
             try
             {
-                System.out.println(in.readUTF());
+                String tmp = in.readUTF();
+                System.out.println(tmp);
+                
             }
             catch (IOException e)
             {

@@ -1,5 +1,6 @@
 package MultiThiefCatch;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class MultiThiefCatch
@@ -17,7 +18,7 @@ public class MultiThiefCatch
     
     void deckSetting()
     {
-       /* for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 10; i++)
             deck[i] = deck[i+10] = deck[i+20] = deck[i+30]  = i+"";
         deck[MAX_DECK_LENGTH-1] = joker;
         
@@ -35,13 +36,13 @@ public class MultiThiefCatch
         players.add(new Player("B",Arrays.copyOfRange(deck, 10,20)));
         players.add(new Player("C",Arrays.copyOfRange(deck, 20,30)));
         players.add(new Player("D",Arrays.copyOfRange(deck, 30,41)));
-        */
         
+        /*
          //test¿ë ÂªÀº µ¦±¸¼º
        players.add(new Player("A",new String[]{"1","4"}));
         players.add(new Player("B",new String[]{"3","2"}));
         players.add(new Player("C",new String[]{"3","1"}));
-        players.add(new Player("D",new String[]{"4","2",joker}));
+        players.add(new Player("D",new String[]{"4","2",joker}));*/
         
     }
     public void start()

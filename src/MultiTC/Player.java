@@ -1,8 +1,10 @@
 package MultiTC;
 
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class Player
@@ -117,19 +119,15 @@ public class Player
         
         System.out.println("ㅡ" +name + "의 손패에서 " + what + " 한쌍 제거 완료");
     }
-    boolean handChk()
-    {
-        for(int i = 0; i < hand.size(); i++)
-        {
-            int cnt = 0;
-            for(int j = 0; j < hand.size(); j++)
-                if(hand.get(i).equals(hand.get(j)))
-                    cnt++;
-            if(cnt == 2 )
-                return true;
+    boolean handChk() {      //한 쌍이라도 존재하는지 확인해서 카드 버릴 거 확인하는 거
+        
+        Set<String> duplicateCheckSet = new HashSet<>(hand);
+           
+           if(hand.size() > duplicateCheckSet.size()) {
+              return true;
+           }
+           return false;
         }
-        return false;
-    }
     String handPrint()
     {
     	String result = "";

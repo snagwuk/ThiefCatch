@@ -47,14 +47,12 @@ public class Player
         before.setHand(before.hand);
         
         ////////////////
-
         
         this.hand.add(getcard);
         System.out.println("ㅡㅡㅡ" + name + "가 " + before.name + "의 카드한장을 뽑은 후 ");
         
         //before.handPrint();
         //handPrint();
-        
         //endChk(before);
     }
    
@@ -75,7 +73,6 @@ public class Player
             }
             else
             {
-                
                 System.out.print("버릴 숫자쌍 선택 (ex: 4)  >>>");
                 Scanner sc1 = new Scanner(System.in);
                 String pair = sc1.nextLine();
