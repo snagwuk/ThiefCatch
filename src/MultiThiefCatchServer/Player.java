@@ -1,5 +1,7 @@
 package MultiThiefCatchServer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -10,30 +12,27 @@ public class Player
     
     LinkedList<String> hand = new LinkedList<String>();
     
-    public Player(String name)
-    {
-        this.name = name;
-    }
+    DataInputStream in;
     
-    public Player(String name, String[] hand)
+    DataOutputStream out;
+    
+    Player(String name, String[] hand, DataInputStream in,DataOutputStream out)
     {
         this.name = name;
-        // this.hand = hand;
         for (String x : hand)
             this.hand.add(x);
+        this.in = in;
+        this.out = out;
     }
-    
-    public LinkedList<String> getHand()
-    {
-        return hand;
-    }
-    
+   
     public void setHand(String[] hand)
     {
         for (String x : hand)
             this.hand.add(x);
     }
     
+   
+
     public void setHand(LinkedList<String> hand)
     {
         this.hand = hand;
@@ -52,6 +51,7 @@ public class Player
         }
     }
     
+
     void getCard(Player before)
     {
         before.handSuffle();

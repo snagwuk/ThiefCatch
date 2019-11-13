@@ -114,7 +114,8 @@ public class MultiThiefCatchClient extends JFrame
             @Override
             public void keyPressed(KeyEvent e)
             {
-                if (e.getKeyCode() == 10) sendToServer();
+                if (e.getKeyCode() == 10) 
+                    sendToServer();
             }
         });
         sendTf.setBounds(12, 226, 274, 21);
@@ -134,7 +135,11 @@ public class MultiThiefCatchClient extends JFrame
         connectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             {
-                if (nameTf.getText().length() < 1) return;
+                if (nameTf.getText().length() < 1) 
+                {
+                    textArea.append("[Error] Name을 입력해야 접속 가능합니다.\n");
+                    return;
+                }
                 try
                 {
                     serverConnect(IPTf.getText(), nameTf.getText());
@@ -167,6 +172,7 @@ public class MultiThiefCatchClient extends JFrame
             {
                 sendToServer();
                 
+                
             }
         });
         sendBtn.setBounds(325, 225, 97, 23);
@@ -191,6 +197,7 @@ public class MultiThiefCatchClient extends JFrame
         {
             out.writeUTF(sendTf.getText());
             sendTf.setText("");
+            sendTf.requestFocus();
         }
         catch (IOException e1)
         {
@@ -223,7 +230,9 @@ public class MultiThiefCatchClient extends JFrame
                     String tmp = in.readUTF();
                     
                     // if (tmp.substring(0, 1).equals("손"))
-                    if (tmp.contains("손"))
+                    if (tmp.contains("등수"))
+                        handTf.setText(tmp.substring(11));
+                    else if (tmp.contains("손"))
                         handTf.setText(tmp.substring(1));
                     else
                     {
