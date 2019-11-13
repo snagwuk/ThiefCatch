@@ -2,7 +2,6 @@ package ThiefCatch;
 
 import java.util.LinkedList;
 
-import MultiThiefCatch.MultiThiefCatch;
 
 public class ThiefCatch
 {
@@ -13,7 +12,7 @@ public class ThiefCatch
     
     public static void main(String[] args)
     {
-       new MultiThiefCatch().start();
+       new ThiefCatch().start();
     }
 
     public void start()

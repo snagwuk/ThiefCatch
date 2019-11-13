@@ -1,4 +1,4 @@
-package MultiTC;
+package MultiThiefCatchServer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -13,9 +13,10 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Set;
 
-public class TcpIpMultichatServer
+public class MultiThiefCatchServer
 {
     HashMap clients; // out, 주소
+    
     HashMap clientsIn; // 1, 서버가 받기위한
     
     LinkedList<Player> players = new LinkedList<Player>();
@@ -23,23 +24,24 @@ public class TcpIpMultichatServer
     int index = 0;
     
     int MAX_DECK_LENGTH = 40 + 1;
+    
     String[] deck = new String[MAX_DECK_LENGTH];
     
     public static void main(String[] args)
     {
         // TODO Auto-generated method stub
         System.out.println(">> Server");
-        new TcpIpMultichatServer().start();
+        new MultiThiefCatchServer().start();
     }
     
-    TcpIpMultichatServer()
+    MultiThiefCatchServer()
     {
         clients = new HashMap();
-        clientsIn = new HashMap(); 
+        clientsIn = new HashMap();
         Collections.synchronizedMap(clientsIn);
         Collections.synchronizedMap(clients);
         
-        String joker = "★ ";
+        String joker = "X";
         for (int i = 0; i < 10; i++)
             deck[i] = deck[i + 10] = deck[i + 20] = deck[i + 30] = i + "";
         deck[MAX_DECK_LENGTH - 1] = joker;
@@ -69,7 +71,8 @@ public class TcpIpMultichatServer
             while (true)
             {
                 socket = serversocket.accept();
-                System.out.println("[" + socket.getInetAddress() + ":"+ socket.getPort() + "] 에서 접속하였습니다.");
+                System.out.println("[" + socket.getInetAddress() + ":"
+                        + socket.getPort() + "] 에서 접속하였습니다.");
                 ServerReceiver thread = new ServerReceiver(socket);
                 thread.start();
                 
@@ -85,13 +88,11 @@ public class TcpIpMultichatServer
                 }
                 
                 if (clients.size() == 4)
-                {   
+                {
                     allPlayerHandPrint();
-                    sendToAll("게임 시작하겠습니다.");
-                    turn(players.get(players.size()-1),players.get(0));
+                    sendToAll("도둑잡기 게임 시작하겠습니다.");
+                    turn(players.get(players.size() - 1), players.get(0));
                 }
-          
-               
                 
             }
             
@@ -113,6 +114,8 @@ public class TcpIpMultichatServer
         
         playerSelect(who);
         
+        ServerAllPlayerHandPrint();
+        
         // 다음 턴 진행을 위한 turn 메소드 호출
         int x = (players.lastIndexOf(who) + 1) % players.size();
         turn(who, players.get(x));
@@ -121,25 +124,28 @@ public class TcpIpMultichatServer
     void playerSelect(Player who)
     {
         DataInputStream in = (DataInputStream) clientsIn.get(who.name);
-   
         
         try
         {
-
-            sendToPlayerMsg(who.name, "1.같은 쌍의 숫자 버리기 / 그외. PASS  >>>");
+            
+            sendToPlayerMsg(who.name, "[1] 같은 쌍의 숫자 버리기 / 그외. PASS");
+            
             String select = in.readUTF();
-            System.out.println(select);
+            if (select.length() != 1)
+            {
+                sendToAll(who.name + "의 턴 종료! ");
+                allPlayerHandPrint();
+                return;
+            }
             if (select.equals("1"))
             {
                 if (!who.handChk())
-                {
                     sendToPlayerMsg(who.name, "쌍이 존재하지않습니다.");
-                }
                 else
                 {
-                    sendToPlayerMsg(who.name, "버릴 숫자쌍 선택 (ex: 4)  >>>");
+                    sendToPlayerMsg(who.name, "버릴 숫자쌍 선택 (ex: 4)");
                     String pair = in.readUTF();
-                    who.removeCard(pair);
+                    if (pair.length() == 1) sendToAll(who.removeCard(pair));
                 }
             }
             sendToAll(who.name + "의 턴 종료! ");
@@ -161,8 +167,9 @@ public class TcpIpMultichatServer
             {
                 try
                 {
-                    DataOutputStream out = (DataOutputStream) clients.get(toPlayer);
-                    out.writeUTF(msg);
+                    DataOutputStream out = (DataOutputStream) clients
+                            .get(toPlayer);
+                    out.writeUTF("[Server] : " + msg);
                 }
                 catch (IOException e)
                 {
@@ -180,8 +187,9 @@ public class TcpIpMultichatServer
         {
             try
             {
-                DataOutputStream out = (DataOutputStream) clients.get(it.next());
-                out.writeUTF(msg);
+                DataOutputStream out = (DataOutputStream) clients
+                        .get(it.next());
+                out.writeUTF("[Server] : " + msg);
             }
             catch (IOException e)
             {
@@ -239,12 +247,12 @@ public class TcpIpMultichatServer
                 if (name.equals(nowturn))
                 {
                     DataOutputStream out = (DataOutputStream) clients.get(name);
-                    out.writeUTF(nowturn + " 당신의 턴입니다");
+                    out.writeUTF("[Server] : " + nowturn + " 당신의 턴입니다");
                 }
                 else
                 {
                     DataOutputStream out = (DataOutputStream) clients.get(name);
-                    out.writeUTF("현재" + nowturn + "의 턴 진행중입니다.");
+                    out.writeUTF("[Server] : 현재" + nowturn + "의 턴 진행중입니다.");
                 }
                 
             }
@@ -266,7 +274,7 @@ public class TcpIpMultichatServer
             if (players.size() == 1)
             {
                 sendToAll("○○○○○○○○○○ 게임 종료 ○○○○○○○○○○");
-                sendToAll("최종 도둑 = " + players.getFirst().name+"님입니다.");
+                sendToAll("최종 도둑 = " + players.getFirst().name + "님입니다.");
                 System.exit(0);
             }
         }
@@ -312,24 +320,23 @@ public class TcpIpMultichatServer
             try
             {
                 name = in.readUTF();
-                sendToAll("#" + name + " 님이 입장!");
+                sendToAll(name + " 님이 입장!");
                 
-                int firstSize = clients.size()*10;
-                int lastSize = clients.size()*10+10;;
-                if(clients.size() == 4)
-                    lastSize++;
-
-                players.add(new Player(name, Arrays.copyOfRange(deck, firstSize,  lastSize)));
+                int firstSize = clients.size() * 10;
+                int lastSize = clients.size() * 10 + 10;
+                ;
+                if (clients.size() == 3) lastSize++;
+                
+                players.add(new Player(name,
+                        Arrays.copyOfRange(deck, firstSize, lastSize)));
                 clients.put(name, out);
                 clientsIn.put(name, in);
-                System.out.println("현재 서버 접속자 수[" + clients.size() + "] 목록 : " + clinetsPrint());
-                
-               
+                sendToAll("접속자 수 : " + clients.size() + " 목록 : "
+                        + clinetsPrint());
                 
                 while (out != null)
                 {
-                    if (clients.size() > 4)
-                        System.out.println(in.readUTF());
+                    if (clients.size() > 4) System.out.println(in.readUTF());
                 }
                 
             }
@@ -340,7 +347,7 @@ public class TcpIpMultichatServer
             
             finally
             {
-                sendToAll("#" + name + " 님이 퇴장.");
+                sendToAll(name + " 님이 퇴장.");
                 clients.remove(name);
                 clientsIn.remove(name);
                 System.out.println("[" + socket.getInetAddress() + ":"
@@ -349,8 +356,6 @@ public class TcpIpMultichatServer
                         + clinetsPrint());
             }
         }
-        
-        
         
     }
     
