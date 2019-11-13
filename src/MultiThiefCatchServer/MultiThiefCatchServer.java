@@ -66,8 +66,8 @@ public class MultiThiefCatchServer
                 ServerReceiver thread = new ServerReceiver(socket);
                 thread.start();
                 
-                thread.sleep(2000);
-                
+                thread.sleep(1000);
+
                 if (players.size() == 4)
                 {
                     allPlayerHandPrint();
@@ -105,10 +105,9 @@ public class MultiThiefCatchServer
         int x = (players.lastIndexOf(who) + 1) % players.size();
         turn(who, players.get(x));
     }
-    
+
     void playerSelect(Player who) throws IOException
-    {
-        
+    { 
         sendToPlayer(who, "[1]. 같은 쌍의 숫자 버리기 / 그 외. PASS");
         
         String select = who.in.readUTF();
@@ -185,8 +184,8 @@ public class MultiThiefCatchServer
     {
         if (who.hand.size() == 0)
         {
-            sendToAll("★★★ " + who.name + " !!클리어!!");
-            sendToPlayer(who, "당신의 등수는 " + rank++);
+            sendToAll("★★★ " + who.name + " 클리어 ★★★ ");
+            sendToPlayer(who, "당신의 등수는 " + rank++ + "등입니다.");
             players.remove(who);
             if (players.size() == 1)
             {
@@ -195,10 +194,10 @@ public class MultiThiefCatchServer
                     x.writeUTF("○○○○○○○○○○ 게임 종료 ○○○○○○○○○○");
                     x.writeUTF("최종 도둑 = " + players.getFirst().name + "님입니다.");
                 }
-                players.getFirst().out.writeUTF("당신은 도둑입니다.");
+                players.getFirst().out.writeUTF("손당신이 도둑입니다.");
                 System.exit(0);
             }
-            sendToPlayer(who, "●●●●●●●●● 남은 플레이어 기다리는 중 ●●●●●●●●●");
+            sendToPlayer(who, "●●●●●●●● 남은 플레이어 기다리는 중 ●●●●●●●●");
         }
     }
     
@@ -207,6 +206,14 @@ public class MultiThiefCatchServer
         for (Player p : players)
             if (p.name.equals(name)) return p;
         return null;
+    }
+    
+    boolean nameChk(String name)
+    {
+        for (Player p : players)
+            if (p.name.equals(name))
+                return true;
+        return false;
     }
     
     class ServerReceiver extends Thread
@@ -241,7 +248,13 @@ public class MultiThiefCatchServer
             try
             {
                 name = in.readUTF();
-                
+
+                if(nameChk(name))
+                {
+                    out.writeUTF("이미 입장한 이름과 중복됩니다.");
+                    return;
+                }
+              
                 sendToAll(name + " 님이 입장!");
                 
                 int firstSize = players.size() * 10;

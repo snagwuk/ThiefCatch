@@ -82,7 +82,7 @@ public class Player
         this.hand.remove(what);
         this.hand.remove(what);
         
-        return (name + "의 손패에서 " + what + " 한쌍 제거 완료");
+        return (name + "의 Hand 에서 " + what + " 한쌍 제거 완료");
     }
     
     boolean handChk()

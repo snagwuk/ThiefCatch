@@ -4,9 +4,6 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import javafx.scene.input.KeyCode;
-
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
@@ -153,7 +150,7 @@ public class MultiThiefCatchClient extends JFrame
                 catch (IOException e1)
                 {
                     // TODO Auto-generated catch block
-                    textArea.append("서버가 열려있지 않습니다.\n");
+                    textArea.append("서버가 열려있지 않거나 정원 초과입니다.\n");
                 }
                 catch (Exception e1)
                 {
@@ -230,9 +227,7 @@ public class MultiThiefCatchClient extends JFrame
                     String tmp = in.readUTF();
                     
                     // if (tmp.substring(0, 1).equals("손"))
-                    if (tmp.contains("등수"))
-                        handTf.setText(tmp.substring(11));
-                    else if (tmp.contains("손"))
+                    if (tmp.substring(0,1).equals("손"))
                         handTf.setText(tmp.substring(1));
                     else
                     {
