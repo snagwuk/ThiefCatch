@@ -10,7 +10,7 @@ public class TestClient
         new MultiThiefCatchClient().main(args);
         new MultiThiefCatchClient().main(args);
         new MultiThiefCatchClient().main(args);
-        new MultiThiefCatchClient().main(args);
+
     }
     
 }

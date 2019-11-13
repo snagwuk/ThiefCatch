@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -77,6 +78,19 @@ public class MultiThiefCatchServer
                 
             }
             
+        }
+        catch (SocketException e) {
+            // TODO: handle exception
+           try
+        {
+            sendToAll("비정상적인 종료로 게임종료.");
+        }
+        catch (IOException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+           System.exit(0);
         }
         catch (IOException e)
         {
@@ -235,6 +249,7 @@ public class MultiThiefCatchServer
             catch (IOException e)
             {
                 // TODO: handle exception
+                
             }
         }
         
@@ -282,8 +297,17 @@ public class MultiThiefCatchServer
             
             finally
             {
-                // sendToAll(name + " 님이 퇴장.");
-                // players.remove(find(name));
+               
+                players.remove(find(name));
+                try
+                {
+                    sendToAll(name + " 님이 퇴장.");
+                }
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 System.out.println("[" + socket.getInetAddress() + ":"
                         + socket.getPort() + "] 에서 접속종료");
             }
