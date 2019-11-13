@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import javafx.scene.input.KeyCode;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
@@ -19,10 +22,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import javax.swing.JScrollPane;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class MultiThiefCatchClient extends JFrame
 {
-    
     Socket socket;
     
     DataOutputStream out;
@@ -39,8 +43,7 @@ public class MultiThiefCatchClient extends JFrame
     
     private JTextArea textArea;
     
-    private JScrollPane scrollPane ;
-
+    private JScrollPane scrollPane;
     
     public static void main(String[] args)
     {
@@ -66,13 +69,14 @@ public class MultiThiefCatchClient extends JFrame
     {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e){
+            public void windowClosing(WindowEvent e)
+            {
                 System.out.println("client 종료");
-                    System.exit(0);
+                System.exit(0);
             }
         });
         setTitle("Mulit Thief Catch Client");
-
+        
         setBounds(100, 100, 450, 300);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -106,6 +110,13 @@ public class MultiThiefCatchClient extends JFrame
         handTf.setColumns(10);
         
         sendTf = new JTextField();
+        sendTf.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == 10) sendToServer();
+            }
+        });
         sendTf.setBounds(12, 226, 274, 21);
         contentPane.add(sendTf);
         sendTf.setColumns(10);
@@ -118,7 +129,6 @@ public class MultiThiefCatchClient extends JFrame
         
         textArea.setLineWrap(true);
         textArea.setEditable(false);
-
         
         JButton connectBtn = new JButton("Connect");
         connectBtn.addActionListener(new ActionListener() {
@@ -155,24 +165,7 @@ public class MultiThiefCatchClient extends JFrame
         sendBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             {
-                
-                if (sendTf.getText().length() != 1) return;
-                if (socket == null) return;
-                
-                textArea.append(sendTf.getText() + "\n");
-                textArea.setCaretPosition(textArea.getDocument().getLength());
-              
-                
-                try
-                {
-                    out.writeUTF(sendTf.getText());
-                    sendTf.setText("");
-                }
-                catch (IOException e1)
-                {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                sendToServer();
                 
             }
         });
@@ -182,6 +175,28 @@ public class MultiThiefCatchClient extends JFrame
         lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel_2.setBounds(12, 198, 97, 15);
         contentPane.add(lblNewLabel_2);
+    }
+    
+    void sendToServer()
+    {
+        if (sendTf.getText().length() != 1)
+        {
+            sendTf.setText("");
+            return;
+        }
+        if (socket == null) return;
+        textArea.append(sendTf.getText() + "\n");
+        textArea.setCaretPosition(textArea.getDocument().getLength());
+        try
+        {
+            out.writeUTF(sendTf.getText());
+            sendTf.setText("");
+        }
+        catch (IOException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
     
     public void serverConnect(String serverIp, String name) throws Exception
@@ -207,18 +222,15 @@ public class MultiThiefCatchClient extends JFrame
                 {
                     String tmp = in.readUTF();
                     
-                    //if (tmp.substring(0, 1).equals("손"))
-                    if(tmp.contains("손"))
+                    // if (tmp.substring(0, 1).equals("손"))
+                    if (tmp.contains("손"))
                         handTf.setText(tmp.substring(1));
                     else
-                    {    
+                    {
                         textArea.append(tmp + "\n");
                         textArea.setCaretPosition(textArea.getDocument().getLength());
                     }
-                    
-                    
                 }
-                // if(tmp.contains("손")) 포함되면
                 
             }
             catch (IOException e)
