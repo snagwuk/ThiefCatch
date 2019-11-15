@@ -33,7 +33,11 @@ public class Player
     
    
 
-    public void setHand(LinkedList<String> hand)
+    public String getName() {
+      return name;
+   }
+
+   public void setHand(LinkedList<String> hand)
     {
         this.hand = hand;
     }
@@ -77,12 +81,12 @@ public class Player
     String removeCard(String what)
     {
         if (!cardPairChk(what))
-            return (what + "은 한쌍이 존재하지 않습니다. 턴을 강제 끝냅니다."); 
+            return ( what + "은 한쌍이 존재하지 않습니다. 턴을 강제 끝냅니다."); 
         
         this.hand.remove(what);
         this.hand.remove(what);
         
-        return (name + "의 Hand 에서 " + what + " 한쌍 제거 완료");
+        return (" → [" + name +"]" + "의 카드에서 [" + what + "] 한쌍 제거 완료");
     }
     
     boolean handChk()

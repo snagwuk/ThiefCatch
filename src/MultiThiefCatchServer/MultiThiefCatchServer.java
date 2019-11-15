@@ -12,28 +12,36 @@ import java.util.LinkedList;
 
 public class MultiThiefCatchServer
 {
-    LinkedList<DataOutputStream> endouts = new LinkedList<DataOutputStream>();
+    LinkedList<DataOutputStream> endouts;
+    // 종료시 모든 참가자에게 게임종료를 알리는 용도의 DataOutputStream 저장공간
     
-    LinkedList<Player> players = new LinkedList<Player>();
+    LinkedList<Player> players;
+    // 입장한 모든 플레이어 저장
     
     int rank = 1;
+    // 등수 순위를 위한 변수
     
     int MAX_DECK_LENGTH = 40 + 1;
+    // 총 덱의 개수 변수
     
-    String[] deck = new String[MAX_DECK_LENGTH];
+    String[] deck;
     
     public static void main(String[] args)
     {
-        // TODO Auto-generated method stub
+        
         System.out.println(">> Server");
         new MultiThiefCatchServer().start();
     }
     
     MultiThiefCatchServer()
     {
-        Collections.synchronizedCollection(players);
+        endouts = new LinkedList<DataOutputStream>();
+        players = new LinkedList<Player>();
         
-        // 초기 4인용 덱 생성
+        Collections.synchronizedCollection(players); // 플레이어 동기화
+        deck = new String[MAX_DECK_LENGTH]; // 기본 카드게임 덱 변수
+        
+        // 초기 4인용 카드덱 생성
         String joker = "X";
         for (int i = 0; i < 10; i++)
             deck[i] = deck[i + 10] = deck[i + 20] = deck[i + 30] = i + "";
@@ -53,7 +61,6 @@ public class MultiThiefCatchServer
     
     void start()
     {
-        
         ServerSocket serversocket = null;
         Socket socket = null;
         
@@ -63,41 +70,55 @@ public class MultiThiefCatchServer
             System.out.println("서버가 시작되었습니다.");
             while (true)
             {
-                socket = serversocket.accept();
+                socket = serversocket.accept(); // 응답기다림
                 ServerReceiver thread = new ServerReceiver(socket);
                 thread.start();
                 
                 thread.sleep(1000);
-
+                
                 if (players.size() == 4)
                 {
+
+                    sendToAll(" 4명의 플레이어가 입장하였습니다.");
+                    sendToAll("\t");
+                    sendToAll(" ─── 도둑잡기게임 시작! ───");
+                    sendToAll(" [입장 순서로 턴이 진행됩니다.]");
+                    sendToAll(" [상대 카드는 무작위로 가져옵니다.]");
                     allPlayerHandPrint();
-                    sendToAll("도둑잡기 게임 시작하겠습니다.");
+                    sendToAll(" 진행 순서  : " + "[" + players.get(0).getName()
+                            + " -> " + players.get(1).getName() + " -> "
+                            + players.get(2).getName() + " -> "
+                            + players.get(3).getName() + "]\n");
+                    
+                    
+                    thread.sleep(2000);
+                    
                     turn(players.get(players.size() - 1), players.get(0));
                 }
                 
             }
             
         }
-        catch (SocketException e) {
+        catch (SocketException e)
+        {
             // TODO: handle exception
-           try
-        {
-            sendToAll("비정상적인 종료로 게임종료.");
-        }
-        catch (IOException e1)
-        {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-           System.exit(0);
+            try
+            {
+                sendToAll(" ──── 비정상적인 종료로 게임을 종료합니다. ───");
+            }
+            catch (IOException e1)
+            {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            System.exit(0);
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
         catch (InterruptedException e)
-        {   
+        {
             e.printStackTrace();
         }
     }
@@ -106,10 +127,10 @@ public class MultiThiefCatchServer
     {
         turnPrint(who); // 현재 턴이 누군지 모두에게 출력하는 메서드
         who.getCard(before); // 현재 플레이어가 이전 플레이어 카드 한장 뽑는 메서드
-        sendToAll(who.name + "가 " + before.name + "의 카드를 한장 뽑았습니다.");
+        sendToAll(" ★ " + who.name + "가 " + before.name + "의 카드를 한장 뽑았습니다. ★");
         allPlayerHandPrint(); // 모든 플레이어 자신 손패 출력
         
-        endChk(before); // 미구현
+        endChk(before); 
         
         playerSelect(who);
         
@@ -119,30 +140,33 @@ public class MultiThiefCatchServer
         int x = (players.lastIndexOf(who) + 1) % players.size();
         turn(who, players.get(x));
     }
-
+    
     void playerSelect(Player who) throws IOException
-    { 
-        sendToPlayer(who, "[1]. 같은 쌍의 숫자 버리기 / 그 외. PASS");
+    {
+        sendToPlayer(who, " [1] 한 쌍의 버릴 카드 선택 / [Any Key] 버릴 카드가 없음");
         
         String select = who.in.readUTF();
+        
         if (select.length() != 1)
         {
-            sendToAll(who.name + "의 턴 종료! ");
+            sendToAll(" " + who.name + "의 턴 종료!");
             allPlayerHandPrint();
             return;
         }
         if (select.equals("1"))
         {
             if (!who.handChk())
-                sendToPlayer(who, "쌍이 존재하지않습니다.");
+                sendToPlayer(who, " ＃ 같은 번호를 가진 한 쌍 카드가 존재하지않습니다.＃");
             else
             {
-                sendToPlayer(who, "버릴 숫자쌍 선택 (ex: 4)");
+                sendToPlayer(who, " 버릴 카드 번호를 선택하세요.");
                 String pair = who.in.readUTF();
                 if (pair.length() == 1) sendToAll(who.removeCard(pair));
             }
         }
-        sendToAll(who.name + "의 턴 종료! ");
+        sendToAll("\n");
+        sendToAll(" ★ " + who.name + "의 턴 종료! ★");
+        // sendToAll("\n");
         allPlayerHandPrint();
         
     }
@@ -150,13 +174,13 @@ public class MultiThiefCatchServer
     void sendToPlayer(Player who, String msg) throws IOException // 특정 플레이어에게
                                                                  // 메시지 전달 메서드
     {
-        who.out.writeUTF("[Server] : " + msg);
+        who.out.writeUTF(msg);
     }
     
     void sendToAll(String msg) throws IOException // 모든 플레이어에게 메시지 전달 메서드
     {
         for (Player x : players)
-            x.out.writeUTF("[Server] : " + msg);
+            x.out.writeUTF(msg);
         System.out.println(msg);
     }
     
@@ -187,9 +211,10 @@ public class MultiThiefCatchServer
         for (Player x : players)
         {
             if (x.equals(now))
-                x.out.writeUTF("[Server] : " + now.name + " 당신의 턴입니다");
+                x.out.writeUTF(" ★ [" + now.name + "]" + " 당신의 턴입니다. ★");
+            
             else
-                x.out.writeUTF("[Server] : 현재" + now.name + "의 턴 진행중입니다.");
+                x.out.writeUTF(" ★ 현재  [" + now.name + "]" + "의 턴 진행 중입니다. ★");
         }
         
     }
@@ -198,20 +223,26 @@ public class MultiThiefCatchServer
     {
         if (who.hand.size() == 0)
         {
-            sendToAll("★★★ " + who.name + " 클리어 ★★★ ");
+            sendToAll("\n");
+            sendToAll("\t            ★★★ [" + who.name + "] 클리어 ★★★\n");
             sendToPlayer(who, "당신의 등수는 " + rank++ + "등입니다.");
             players.remove(who);
             if (players.size() == 1)
             {
                 for (DataOutputStream x : endouts)
                 {
-                    x.writeUTF("○○○○○○○○○○ 게임 종료 ○○○○○○○○○○");
-                    x.writeUTF("최종 도둑 = " + players.getFirst().name + "님입니다.");
+                    
+                    x.writeUTF("           ─────────── 게임 종료 ────────────\n");
+                    sendToAll("\n");
+                    
+                    x.writeUTF("\t    ─── 도둑은 [" + players.getFirst().name
+                            + "] 너였구나 ─── ");
                 }
                 players.getFirst().out.writeUTF("손당신이 도둑입니다.");
                 System.exit(0);
             }
-            sendToPlayer(who, "●●●●●●●● 남은 플레이어 기다리는 중 ●●●●●●●●");
+            
+            sendToPlayer(who, "           ─────── 남은 플레이어 기다리는 중 ────────\n");
         }
     }
     
@@ -225,8 +256,7 @@ public class MultiThiefCatchServer
     boolean nameChk(String name)
     {
         for (Player p : players)
-            if (p.name.equals(name))
-                return true;
+            if (p.name.equals(name)) return true;
         return false;
     }
     
@@ -263,14 +293,14 @@ public class MultiThiefCatchServer
             try
             {
                 name = in.readUTF();
-
-                if(nameChk(name))
+                
+                if (nameChk(name))
                 {
-                    out.writeUTF("이미 입장한 이름과 중복됩니다.");
+                    out.writeUTF(" 이미 입장한 이름과 중복됩니다.");
                     return;
                 }
-              
-                sendToAll(name + " 님이 입장!");
+                
+                sendToAll(" ＃＃＃" + name + " 님이 입장! ＃＃＃");
                 
                 int firstSize = players.size() * 10;
                 int lastSize = players.size() * 10 + 10;
@@ -281,8 +311,10 @@ public class MultiThiefCatchServer
                 players.add(player);
                 endouts.add(out);
                 
-                sendToAll("접속자 수 : " + players.size() + " 목록 : "
-                        + clinetsPrint());
+                sendToAll(" 접속 인원이 4명일 때, 게임이 시작됩니다. -> 게임 인원 모집중");
+                sendToAll(" 접속자 수 : " + players.size());
+                sendToAll(" 입장한 플레이어 목록 -> " + clinetsPrint());
+                sendToAll("\n");
                 
                 while (out != null)
                 {
@@ -297,18 +329,18 @@ public class MultiThiefCatchServer
             
             finally
             {
-               
+                
                 players.remove(find(name));
                 try
                 {
-                    sendToAll(name + " 님이 퇴장.");
+                    sendToAll(" " + name + " 님이 퇴장합니다.");
                 }
                 catch (IOException e)
                 {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                System.out.println("[" + socket.getInetAddress() + ":"
+                System.out.println(" [" + socket.getInetAddress() + ":"
                         + socket.getPort() + "] 에서 접속종료");
             }
         }

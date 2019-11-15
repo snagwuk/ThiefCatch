@@ -214,7 +214,7 @@ public class MultiThiefCatchClient extends JFrame
         out.writeUTF(name);
     }
     
-    class ClientReceiver extends Thread
+    class ClientReceiver extends Thread // 이너클래스
     {
         
         public void run()
@@ -226,12 +226,21 @@ public class MultiThiefCatchClient extends JFrame
                 {
                     String tmp = in.readUTF();
                     
+                    
+                    // 게임 종료 마지막 출력문, 
                     // if (tmp.substring(0, 1).equals("손"))
-                    if (tmp.substring(0,1).equals("손"))
-                        handTf.setText(tmp.substring(1));
+                    
+                    if (tmp.substring(0,1).equals("손"))   // 마지막 도둑인지 확인하는 조건문
+                        handTf.setText(tmp.substring(1)); // 손을 자르고 인덱스 1부터 끝까지 카드패 출력
+                    
+                        else if(tmp.contains("등수")) {
+                           handTf.setText(tmp);
+                        }
                     else
                     {
+                       // GUI 큰 네모박스 안
                         textArea.append(tmp + "\n");
+                        // 스크롤 맨 아래로 잡아줌.
                         textArea.setCaretPosition(textArea.getDocument().getLength());
                     }
                 }
