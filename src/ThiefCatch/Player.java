@@ -7,13 +7,11 @@ import java.util.Scanner;
 public class Player
 {
     String name;
-    //String[] hand;
     LinkedList<String> hand = new LinkedList<String>();
 
     public Player(String name, String[] hand)
     {
         this.name = name;
-        //this.hand = hand;
         for(String x : hand)
             this.hand.add(x);
     }
@@ -46,17 +44,11 @@ public class Player
         before.hand.remove(getcard);
         before.setHand(before.hand);
         
-        ////////////////
-        
         this.hand.add(getcard);
         System.out.println("ㅡㅡㅡ" + name + "가 " + before.name + "의 카드한장을 뽑은 후 ");
-        
-        //before.handPrint();
-        //handPrint();
-        //endChk(before);
+
     }
    
-
     @SuppressWarnings("resource")
     void playerSelect()
     {

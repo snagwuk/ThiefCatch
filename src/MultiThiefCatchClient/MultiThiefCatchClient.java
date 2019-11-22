@@ -111,8 +111,7 @@ public class MultiThiefCatchClient extends JFrame
             @Override
             public void keyPressed(KeyEvent e)
             {
-                if (e.getKeyCode() == 10) 
-                    sendToServer();
+                if (e.getKeyCode() == 10) sendToServer();
             }
         });
         sendTf.setBounds(12, 226, 274, 21);
@@ -132,7 +131,7 @@ public class MultiThiefCatchClient extends JFrame
         connectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             {
-                if (nameTf.getText().length() < 1) 
+                if (nameTf.getText().length() < 1)
                 {
                     textArea.append("[Error] Name을 입력해야 접속 가능합니다.\n");
                     return;
@@ -144,17 +143,14 @@ public class MultiThiefCatchClient extends JFrame
                 }
                 catch (UnknownHostException e1)
                 {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
                 catch (IOException e1)
                 {
-                    // TODO Auto-generated catch block
                     textArea.append("서버가 열려있지 않거나 정원 초과입니다.\n");
                 }
                 catch (Exception e1)
                 {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
                 
@@ -168,8 +164,6 @@ public class MultiThiefCatchClient extends JFrame
             public void actionPerformed(ActionEvent e)
             {
                 sendToServer();
-                
-                
             }
         });
         sendBtn.setBounds(325, 225, 97, 23);
@@ -198,7 +192,6 @@ public class MultiThiefCatchClient extends JFrame
         }
         catch (IOException e1)
         {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     }
@@ -216,41 +209,34 @@ public class MultiThiefCatchClient extends JFrame
     
     class ClientReceiver extends Thread // 이너클래스
     {
-        
         public void run()
         {
-            
             try
             {
                 while (in != null)
                 {
                     String tmp = in.readUTF();
-                    
-                    
-                    // 게임 종료 마지막 출력문, 
-                    // if (tmp.substring(0, 1).equals("손"))
-                    
-                    if (tmp.substring(0,1).equals("손"))   // 마지막 도둑인지 확인하는 조건문
-                        handTf.setText(tmp.substring(1)); // 손을 자르고 인덱스 1부터 끝까지 카드패 출력
-                    
-                        else if(tmp.contains("등수")) {
-                           handTf.setText(tmp);
-                        }
+                    // 게임 종료 마지막 출력문
+                    if (tmp.substring(0, 1).equals("손")) // 마지막 도둑인지 확인하는 조건문
+                        handTf.setText(tmp.substring(1));  
+                    else if (tmp.contains("등수"))
+                    {
+                        handTf.setText(tmp);
+                    }
                     else
                     {
-                       // GUI 큰 네모박스 안
+                        // GUI 큰 네모박스 안
                         textArea.append(tmp + "\n");
                         // 스크롤 맨 아래로 잡아줌.
-                        textArea.setCaretPosition(textArea.getDocument().getLength());
+                        textArea.setCaretPosition(textArea.getDocument()
+                                .getLength());
                     }
                 }
-                
             }
             catch (IOException e)
             {
-                // TODO: handle exception
+                e.printStackTrace();
             }
-            
         }
     }
 }

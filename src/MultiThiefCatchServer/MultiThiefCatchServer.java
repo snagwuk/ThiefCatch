@@ -58,7 +58,6 @@ public class MultiThiefCatchServer
             deck[ran2] = tmp;
         }
     }
-    
     void start()
     {
         ServerSocket serversocket = null;
@@ -101,14 +100,12 @@ public class MultiThiefCatchServer
         }
         catch (SocketException e)
         {
-            // TODO: handle exception
             try
             {
                 sendToAll(" ──── 비정상적인 종료로 게임을 종료합니다. ───");
             }
             catch (IOException e1)
             {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
             System.exit(0);
@@ -166,26 +163,24 @@ public class MultiThiefCatchServer
         }
         sendToAll("\n");
         sendToAll(" ★ " + who.name + "의 턴 종료! ★");
-        // sendToAll("\n");
         allPlayerHandPrint();
         
     }
     
-    void sendToPlayer(Player who, String msg) throws IOException // 특정 플레이어에게
-                                                                 // 메시지 전달 메서드
-    {
+    void sendToPlayer(Player who, String msg) throws IOException 
+    {   // 특정 플레이어에게 메시지 전달 메서드
         who.out.writeUTF(msg);
     }
     
-    void sendToAll(String msg) throws IOException // 모든 플레이어에게 메시지 전달 메서드
-    {
+    void sendToAll(String msg) throws IOException 
+    {   // 모든 플레이어에게 메시지 전달 메서드
         for (Player x : players)
             x.out.writeUTF(msg);
         System.out.println(msg);
     }
     
-    String clinetsPrint() // 현재 클라이언트 목록들 String값으로 반환
-    {
+    String clinetsPrint() 
+    {   // 현재 클라이언트 목록들 String값으로 반환
         String result = "";
         
         for (Player x : players)
@@ -193,34 +188,31 @@ public class MultiThiefCatchServer
         return result;
     }
     
-    void ServerAllPlayerHandPrint() // server에게 모든 플레이어 핸드 출력
-    {
+    void ServerAllPlayerHandPrint() 
+    {   // server 콘솔창에 모든 플레이어 핸드 출력
         for (Player x : players)
             System.out.println(x.handPrint());
         System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
     }
     
-    void allPlayerHandPrint() throws IOException // 모든 플레이어에게 자신의 손패 출력
-    {
+    void allPlayerHandPrint() throws IOException 
+    {   // 모든 플레이어에게 자신의 손패 출력
         for (Player x : players)
             x.out.writeUTF(x.handPrint());
     }
     
-    void turnPrint(Player now) throws IOException // 턴 진행 상황 모든 플레이어에게 출력
-    {
+    void turnPrint(Player now) throws IOException 
+    {   // 턴 진행 상황 모든 플레이어에게 출력
         for (Player x : players)
         {
             if (x.equals(now))
                 x.out.writeUTF(" ★ [" + now.name + "]" + " 당신의 턴입니다. ★");
-            
             else
                 x.out.writeUTF(" ★ 현재  [" + now.name + "]" + "의 턴 진행 중입니다. ★");
         }
-        
     }
-    
-    void endChk(Player who) throws IOException // 손패 size 체크
-    {
+    void endChk(Player who) throws IOException 
+    {   // 손패 size 체크
         if (who.hand.size() == 0)
         {
             sendToAll("\n");
@@ -246,20 +238,20 @@ public class MultiThiefCatchServer
         }
     }
     
-    Player find(String name) // 입력받은 이름을 가진 Player 객체 반환 메서드
-    {
+    Player find(String name) 
+    {   // 입력받은 이름을 가진 Player 객체 반환 메서드
         for (Player p : players)
             if (p.name.equals(name)) return p;
         return null;
     }
     
     boolean nameChk(String name)
-    {
+    {   // 중복된 이름을 가진 사용자가 있는지 여부 반환 메서드
         for (Player p : players)
-            if (p.name.equals(name)) return true;
+            if (p.name.equals(name)) 
+                return true;
         return false;
     }
-    
     class ServerReceiver extends Thread
     {
         Socket socket;
@@ -278,18 +270,14 @@ public class MultiThiefCatchServer
             }
             catch (IOException e)
             {
-                // TODO: handle exception
-                
+                e.printStackTrace();
             }
         }
         
         @Override
         public void run()
-        
         {
-            // TODO Auto-generated method stub
             String name = "";
-            
             try
             {
                 name = in.readUTF();
@@ -324,12 +312,11 @@ public class MultiThiefCatchServer
             }
             catch (IOException e)
             {
-                // TODO: handle exception
+                e.printStackTrace();
             }
             
             finally
             {
-                
                 players.remove(find(name));
                 try
                 {
@@ -337,14 +324,11 @@ public class MultiThiefCatchServer
                 }
                 catch (IOException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 System.out.println(" [" + socket.getInetAddress() + ":"
                         + socket.getPort() + "] 에서 접속종료");
             }
         }
-        
     }
-    
 }
